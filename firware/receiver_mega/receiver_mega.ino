@@ -9,10 +9,10 @@ void loop(){
     if(Serial.available() > 0){
         char data = Serial.read();
 
-        if(data == 'H'){
+        if(data == 'O'){
             digitalWrite(LED_BUILTIN, HIGH);
         }
-        else if(data == 'N'){
+        else if(data == 'C'){
             digitalWrite(LED_BUILTIN, LOW);
         }
     }
