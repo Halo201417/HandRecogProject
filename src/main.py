@@ -1,22 +1,19 @@
 import cv2
 import serial
 import time
-import sys
-import pickle
 import numpy as np
-from detector import HandDetector
 import os
+from detector import HandDetector
+import tensorflow as tf
 
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 #Starting the AI model
 print("Charging the model")
 try:
-    with open('model.p', 'rb') as f:
-        model_data = pickle.load(f)
-        
-    model = model_data['model']
-    print("Model loaded")
+    model = tf.keras.models.load_model('hand_model.h5')
+    classes = np.load('classes.npy')
+    print("Model charge")
 except FileNotFoundError:
     print("ERROR: File not Found")
     sys.exit()
@@ -81,19 +78,23 @@ while True:
             data_aux.append(point[1] - x_base)
             data_aux.append(point[2] - y_base)
             
-        prediction = model.predict([np.asarray(data_aux)])
-        letter_detected = prediction[0]
+        input_data = np.array([data_aux], dtype=np.float32)
         
-        cv2.rectangle(img, (0,0), (160,160), (0,0,0), -1)
-        cv2.putText(img, f"Letter: {letter_detected}", (10,40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        prediction_probs = model.predict(input_data, verbose=0)
+        index_max = np.argmax(prediction_probs)
+        probability = prediction_probs[0][index_max]
         
-        if ser and letter_detected != last_prediction:
-            ser.write(letter_detected.encode())
-            last_prediction = letter_detected
-            print(f"Send: {letter_detected}")
+        if probability > 0.8:
+            actual_letter = classes[index_max]
+            
+            cv2.putText(img, f"{actual_letter} ({int(probability*100)}%)", (10,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+            
+        if ser and actual_letter != last_letter:
+            ser.write(actual_letter.encode())
+            last_letter = actual_letter
             time.sleep(0.1)
             
-    cv2.imshow("Translate LSE", img)
+    cv2.imshow("Neural network", img)
     if cv2.waitKey(1) & 0xFF == 27:
         break
     
