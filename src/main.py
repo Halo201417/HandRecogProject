@@ -1,6 +1,7 @@
 import cv2
 import serial
 import time
+import sys
 import numpy as np
 import os
 from detector import HandDetector
