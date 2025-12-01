@@ -2,10 +2,24 @@ import cv2
 import serial
 import time
 import sys
+import pickle
+import numpy as np
 from detector import HandDetector
 import os
 
 os.environ["QT_QPA_PLATFORM"] = "xcb"
+
+#Starting the AI model
+print("Charging the model")
+try:
+    with open('model.p', 'rb') as f:
+        model_data = pickle.load(f)
+        
+    model = model_data['model']
+    print("Model loaded")
+except FileNotFoundError:
+    print("ERROR: File not Found")
+    sys.exit()
 
 # Configuration for the serial port (in Linux /dev/ttyACM0)
 try:
@@ -40,6 +54,7 @@ if cap is None:
     sys.exit()
     
 detector = HandDetector(max_hands=1)
+last_prediction = ""
 
 print("System ready")
 print("Press 'Esc' to exit")
@@ -58,22 +73,27 @@ while True:
     lm_list = detector.find_position(img)
     
     if len(lm_list) != 0:
-        fingers = detector.count_fingers()
-        total_fingers = fingers.count(1)
+        data_aux = []
+        x_base = lm_list[0][1]
+        y_base = lm_list[0][2]
         
-        print(f"Fingers: {total_fingers}")
-        
-        if ser:
-            if total_fingers == 5:
-                ser.write(b'O')
-            elif total_fingers == 0:
-                ser.write(b'C')       
-    else:
-        if ser:
-            ser.write(b'N')
+        for point in lm_list:
+            data_aux.append(point[1] - x_base)
+            data_aux.append(point[2] - y_base)
             
-    cv2.imshow("Hand Recognition", img)
-    
+        prediction = model.predict([np.asarray(data_aux)])
+        letter_detected = prediction[0]
+        
+        cv2.rectangle(img, (0,0), (160,160), (0,0,0), -1)
+        cv2.putText(img, f"Letter: {letter_detected}", (10,40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        
+        if ser and letter_detected != last_prediction:
+            ser.write(letter_detected.encode())
+            last_prediction = letter_detected
+            print(f"Send: {letter_detected}")
+            time.sleep(0.1)
+            
+    cv2.imshow("Translate LSE", img)
     if cv2.waitKey(1) & 0xFF == 27:
         break
     
