@@ -1,79 +1,94 @@
 import cv2
-import serial
 import time
 import sys
 import numpy as np
 import os
+from collections import deque
 from detector import HandDetector
 import tensorflow as tf
 
+#System configuration
+RASPBERRY_MODE = True
+
+#Graphic configuration for Linux
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
-#Starting the AI model
-print("Charging the model")
+#Display configuration
+try:
+    from rpi_lcd import LCD
+    lcd = LCD()
+    print("[HARDWARE] LCD display detected")
+except ImportError:
+    print("[WARNING] Library rpi_lcd not found. Simulation on Console")
+    class LCD_Simulation:
+        def text(self, message, line):
+            print(f">> LCD Line {line}: {message}")
+        def clear(self):
+            pass
+    lcd = LCD_Simulation()
+    
+#Charge model
+print("Charging the AI model...")
 try:
     model = tf.keras.models.load_model('hand_model.h5')
     classes = np.load('classes.npy')
-    print("Model charge")
+    print("Model charged")
 except FileNotFoundError:
-    print("ERROR: File not Found")
+    print("CRITICAL ERROR: Files not found")
+    print("Execute first src/train_model.py")
     sys.exit()
-
-# Configuration for the serial port (in Linux /dev/ttyACM0)
-try:
-    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
-    time.sleep(2)   #Wait for a reseat
-    print("Connection successful")
-except:
-    print("WARNING: Arduino is not connected")
-    ser = None
-
-# Configuration of camera and Detector
+    
 cap = None
 
-for index in range(3):
-    print(f"Testing camara index {index}...")
-    temp_cap = cv2.VideoCapture(index)
-    
+for i in range(3):
+    temp_cap = cv2.VideoCapture(i)
     if temp_cap.isOpened():
-        ret, frame = temp_cap.read()
-        
+        ret, _ = temp_cap.read()
         if ret:
-            print(f"[SUCCESS] Camera found in the index {index}")
+            print(f"[CAMERA] Found in index {i}")
             cap = temp_cap
             break
         else:
             temp_cap.release()
-    else:
-        temp_cap.release()
-        
-if cap is None:
-    print("Critical error: Not camera found")
+            
+if not cap:
+    print("CRITICAL ERROR: Camera not found")
     sys.exit()
     
+#Variables initialation
 detector = HandDetector(max_hands=1)
-last_prediction = ""
+last_letter_shown = ""
 
-print("System ready")
-print("Press 'Esc' to exit")
+#'Z' variables for dinamic detection
+historial_x = deque(maxlen=15)
+Z_THRESHOLD_MOVEMENT = 0.15
+
+print("--- SIGN LANGUAGE TRANSLATOR ---")
+print("Press ESC to exit")
+
+lcd.text("Translator LSE", 1)
+lcd.text("Ready...", 2)
+time.sleep(2)
+lcd.clear()
 
 while True:
     success, img = cap.read()
-    
     if not success:
-        print("Error reading frame")
-        continue
+        print("Error to read the camera")
+        break
     
-    #Find hands
     img = detector.find_hands(img)
-    
-    #Find positions
     lm_list = detector.find_position(img)
     
-    if len(lm_list) != 0:
+    actual_letter = ""
+    probability = 0.0
+    
+    if len(lm_list) > 0:
         data_aux = []
         x_base = lm_list[0][1]
         y_base = lm_list[0][2]
+        
+        h_img, w_img, _ = img.shape
         
         for point in lm_list:
             data_aux.append(point[1] - x_base)
@@ -81,25 +96,50 @@ while True:
             
         input_data = np.array([data_aux], dtype=np.float32)
         
-        prediction_probs = model.predict(input_data, verbose=0)
-        index_max = np.argmax(prediction_probs)
-        probability = prediction_probs[0][index_max]
+        prediction = model.predict(input_data, verbose=0)
+        max_index = np.argmax(prediction)
+        probability = prediction[0][max_index]
         
-        if probability > 0.8:
-            actual_letter = classes[index_max]
+        if probability > 0.7:
+            detected_class = classes[max_index]
+            actual_letter = detected_class
             
-            cv2.putText(img, f"{actual_letter} ({int(probability*100)}%)", (10,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+            #Movement logic for the letter Z
+            if detected_class == 'D' or detected_class == 'Index':
+                pos_x_relative = lm_list[8][1] / w_img
+                historial_x.append(pos_x_relative)
+                
+                if len(historial_x) == 15:
+                    sweep_width = max(historial_x) - min(historial_x)
+                    
+                    if sweep_width > Z_THRESHOLD_MOVEMENT:
+                        actual_letter = 'Z'
+                        historial_x.clear()
+            else:
+                historial_x.clear()
+                
+            #Show it on the LCD
+            if actual_letter != last_letter_shown:
+                lcd.clear()
+                lcd.text("Letter:", 1)
+                lcd.text(f"     {actual_letter}", 2)
+                last_letter_shown = actual_letter
+                print(f"[TRANSLATOR] Detected: {actual_letter}")
+                
+            text_color = (0, 255, 0)
+            if actual_letter == 'Z' :
+                text_color = (0, 0, 255)
+                
+            cv2.putText(img, f"Letter: {actual_letter} ({int(probability*100)}%)", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
             
-        if ser and actual_letter != last_letter:
-            ser.write(actual_letter.encode())
-            last_letter = actual_letter
-            time.sleep(0.1)
-            
-    cv2.imshow("Neural network", img)
+    cv2.imshow("Raspberry Pi, camera", img)
+    
     if cv2.waitKey(1) & 0xFF == 27:
         break
     
 cap.release()
-if ser:
-    ser.close()
+lcd.clear()
+lcd.text("Turning off...", 1)
+time.sleep(1)
+lcd.clear()
 cv2.destroyAllWindows()
