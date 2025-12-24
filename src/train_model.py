@@ -5,6 +5,7 @@ from sklearn.preprocessing import LabelEncoder
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 print("Loading data...")
 try:
@@ -23,12 +24,14 @@ np.save('classes.npy', label_encoder.classes_)
 
 y_categorical = tf.keras.utils.to_categorical(y)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y_categorical, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y_categorical, test_size=0.2, random_state=42, stratify=y)
 
 #Neuronal network
 model = Sequential([
-    Dense(128, input_shape=(42,), activation='relu'),
-    Dropout(0.2),
+    Dense(256, input_shape=(42,), activation='relu'),
+    Dropout(0.3),
+    Dense(128, activation='relu'),
+    Dropout(0.3),
     Dense(64, activation='relu'),
     Dropout(0.2),
     Dense(32, activation='relu'),
@@ -39,8 +42,15 @@ model.compile(optimizer='adam',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 
+callbacks = [
+    EarlyStopping(monitor='val_loss', patience=20, verbose=1, restore_best_weights=True),
+    ModelCheckpoint('hand_model.h5', monitor='val_loss', save_best_only=True, verbose=1)
+]
+
 print("Training...")
-model.fit(X_train, y_train, epochs=50, batch_size=32, validation_data=(X_test, y_test))
+history = model.fit(X_train, y_train, epochs=200, batch_size=32, validation_data=(X_test, y_test), callbacks=callbacks)
 
 model.save('hand_model.h5')
+loss, accuracy = model.evaluate(X_test, y_test)
+print(f"Accuracy in test: {accuracy*100:.2f}%")
 print("Model save")

@@ -58,10 +58,13 @@ if not cap:
 #Variables initialation
 detector = HandDetector(max_hands=1)
 last_letter_shown = ""
+next_letter = ""
+FPS_count = 0
+THRESHOLD_CONFIRMATION = 8
 
 #'Z' variables for dinamic detection
 historial_x = deque(maxlen=15)
-Z_THRESHOLD_MOVEMENT = 0.15
+Z_THRESHOLD_MOVEMENT = 0.10
 
 print("--- SIGN LANGUAGE TRANSLATOR ---")
 print("Press ESC to exit")
@@ -102,10 +105,21 @@ while True:
         
         if probability > 0.7:
             detected_class = classes[max_index]
-            actual_letter = detected_class
+            
+            if detected_class == next_letter:
+                FPS_count += 1
+            else:
+                next_letter = detected_class
+                FPS_count = 0
+                
+            if FPS_count > THRESHOLD_CONFIRMATION:
+                actual_letter = detected_class
+                
+                if FPS_count > 100:
+                    FPS_count = THRESHOLD_CONFIRMATION + 1
             
             #Movement logic for the letter Z
-            if detected_class == 'D' or detected_class == 'Index':
+            if detected_class == 'D' or detected_class == 'Index' or detected_class == 'X':
                 pos_x_relative = lm_list[8][1] / w_img
                 historial_x.append(pos_x_relative)
                 
