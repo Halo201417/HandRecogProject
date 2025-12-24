@@ -115,9 +115,6 @@ while True:
                 
             #Show it on the LCD
             if actual_letter != last_letter_shown:
-                lcd.clear()
-                lcd.text("Letter:", 1)
-                lcd.text(f"     {actual_letter}", 2)
                 last_letter_shown = actual_letter
                 print(f"[TRANSLATOR] Detected: {actual_letter}")
                 
@@ -135,8 +132,4 @@ while True:
         break
     
 cap.release()
-lcd.clear()
-lcd.text("Turning off...", 1)
-time.sleep(1)
-lcd.clear()
 cv2.destroyAllWindows()
