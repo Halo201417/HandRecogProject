@@ -145,7 +145,8 @@ while True:
                 text_color = (0, 0, 255)
                 
             cv2.putText(img, f"Letter: {actual_letter} ({int(probability*100)}%)", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
-            
+           
+    img_final = cv2.resize(img, (480,320)) 
     cv2.imshow("Raspberry Pi, camera", img)
     
     if cv2.waitKey(1) & 0xFF == 27:
