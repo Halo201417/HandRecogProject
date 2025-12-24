@@ -55,11 +55,6 @@ Z_THRESHOLD_MOVEMENT = 0.10
 print("--- SIGN LANGUAGE TRANSLATOR ---")
 print("Press ESC to exit")
 
-lcd.text("Translator LSE", 1)
-lcd.text("Ready...", 2)
-time.sleep(2)
-lcd.clear()
-
 while True:
     success, img = cap.read()
     if not success:
