@@ -31,7 +31,7 @@ except ImportError:
 print("Charging the AI model...")
 try:
     model = tf.keras.models.load_model('hand_model.h5')
-    classes = np.load('classes.npy')
+    classes = np.load('classes.npy', allow_pickle=True)
     print("Model charged")
 except FileNotFoundError:
     print("CRITICAL ERROR: Files not found")
