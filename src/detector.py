@@ -53,26 +53,3 @@ class HandDetector:
                 self.lm_list.append([id, cx, cy])
                 
         return self.lm_list
-    
-    def count_fingers(self):
-        """
-        We count the fingers that are up
-        """
-        
-        fingers = []
-        
-        if len(self.lm_list) != 0:
-            #Checking if the point is at the right
-            if self.lm_list[self.tip_ids[0]][1] > self.lm_list[self.tip_ids[0] - 1][1]:
-                fingers.append(1)
-            else:
-                fingers.append(0)
-                
-            #The other fingers we compare the middle articulation
-            for id in range(1, 5):
-                if self.lm_list[self.tip_ids[id]][2] < self.lm_list[self.tip_ids[id]-2][2]:
-                    fingers.append(1)
-                else:
-                    fingers.append(0)
-                    
-        return fingers

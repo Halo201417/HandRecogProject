@@ -12,20 +12,6 @@ RASPBERRY_MODE = True
 
 #Graphic configuration for Linux
 os.environ["QT_QPA_PLATFORM"] = "xcb"
-
-#Display configuration
-try:
-    from rpi_lcd import LCD
-    lcd = LCD()
-    print("[HARDWARE] LCD display detected")
-except ImportError:
-    print("[WARNING] Library rpi_lcd not found. Simulation on Console")
-    class LCD_Simulation:
-        def text(self, message, line):
-            print(f">> LCD Line {line}: {message}")
-        def clear(self):
-            pass
-    lcd = LCD_Simulation()
     
 #Charge model
 print("Charging the AI model...")
