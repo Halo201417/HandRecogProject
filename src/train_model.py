@@ -103,6 +103,16 @@ history = model.fit(
 
 print("Model save as 'hand_model.h5'")
 
+#Export as TFLITE (For Raspberry)
+print("Tranforming into TensorFlow Lite...")
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+tflite_model = converter.convert()
+
+with open('hand_model.tflite', 'wb') as f:
+    f.write(tflite_model)
+print("Model save as 'hand_model_tflite'")
+
 
 loss, accuracy = model.evaluate(X_test, y_test)
 print(f"Accuracy final tests: {accuracy*100:.2f}%")
