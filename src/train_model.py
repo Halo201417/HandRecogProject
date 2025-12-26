@@ -67,9 +67,14 @@ X_aug, y_aug = augment_data(X_original, y_index, copies=10)
 
 print(f"Total data for training: {len(X_aug)} samples")
 
+#Normalization
+max_vals = np.max(np.abs(X_aug), axis=1).reshape(-1, 1)
+max_vals[max_vals == 0] = 1.0
+X_normalized = X_aug / max_vals
+
 y_categorical = tf.keras.utils.to_categorical(y_aug)
 
-X_train, X_test, y_train, y_test = train_test_split(X_aug, y_categorical, test_size=0.2, random_state=42, stratify=y_aug)
+X_train, X_test, y_train, y_test = train_test_split(X_normalized, y_categorical, test_size=0.2, random_state=42, stratify=y_aug)
 
 #Model for Raspberry Pi 5
 model = Sequential([
@@ -106,7 +111,7 @@ print("Model save as 'hand_model.h5'")
 #Export as TFLITE (For Raspberry)
 print("Tranforming into TensorFlow Lite...")
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
-converter.target_spec.supported_types = [tf.float32] 
+converter.target_spec.supported_types = [tf.float32]
 converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
 tflite_model = converter.convert()
 
