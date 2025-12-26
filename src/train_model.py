@@ -4,7 +4,7 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Activation, LeakyReLu
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Activation, LeakyReLU
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -35,7 +35,7 @@ def augment_data(X, y, noise_level=0.05, scale_range=(0.9, 1.1), copies=5):
             
             #Scale
             scale = np.random.uniform(scale_range[0], scale_range[1])
-            sample = sample + scale
+            sample = sample * scale
             
             #Noise
             noise = np.random.normal(0, noise_level, sample.shape)
@@ -73,10 +73,10 @@ X_train, X_test, y_train, y_test = train_test_split(X_aug, y_categorical, test_s
 
 #Model for Raspberry Pi 5
 model = Sequential([
-    Dense(512, input_shape=(42,), use_bias=False), BatchNormalization(), LeakyReLu(alpha=0.1), Dropout(0.3),
-    Dense(256, use_bias=False), BatchNormalization(), LeakyReLu(alpha=0.1), Dropout(0.3),
-    Dense(128, use_bias=False), BatchNormalization(), LeakyReLu(alpha=0.1), Dropout(0.2),
-    Dense(64, use_bias=False), BatchNormalization(), LeakyReLu(alpha=0.1),
+    Dense(512, input_shape=(42,), use_bias=False), BatchNormalization(), LeakyReLU(alpha=0.1), Dropout(0.3),
+    Dense(256, use_bias=False), BatchNormalization(), LeakyReLU(alpha=0.1), Dropout(0.3),
+    Dense(128, use_bias=False), BatchNormalization(), LeakyReLU(alpha=0.1), Dropout(0.2),
+    Dense(64, use_bias=False), BatchNormalization(), LeakyReLU(alpha=0.1),
     Dense(y_categorical.shape[1], activation='softmax')
 ])
 
