@@ -4,7 +4,7 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Activation
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Activation, LeakyReLu
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -63,7 +63,7 @@ np.save('classes.npy', label_encoder.classes_)
 print(f"Original data: {len(X_original)} samples")
 print("Generating Data Augmentation")
 
-X_aug, y_aug = augment_data(X_original, y_index, copies=5)
+X_aug, y_aug = augment_data(X_original, y_index, copies=10)
 
 print(f"Total data for training: {len(X_aug)} samples")
 
@@ -73,15 +73,15 @@ X_train, X_test, y_train, y_test = train_test_split(X_aug, y_categorical, test_s
 
 #Model for Raspberry Pi 5
 model = Sequential([
-    Dense(512, input_shape=(42,), use_bias=False), BatchNormalization(), Activation('relu'), Dropout(0.4),
-    Dense(256, use_bias=False), BatchNormalization(), Activation('relu'), Dropout(0.3),
-    Dense(128, use_bias=False), BatchNormalization(), Activation('relu'), Dropout(0.3),
-    Dense(64, use_bias=False), BatchNormalization(), Activation('relu'),
+    Dense(512, input_shape=(42,), use_bias=False), BatchNormalization(), LeakyReLu(alpha=0.1), Dropout(0.3),
+    Dense(256, use_bias=False), BatchNormalization(), LeakyReLu(alpha=0.1), Dropout(0.3),
+    Dense(128, use_bias=False), BatchNormalization(), LeakyReLu(alpha=0.1), Dropout(0.2),
+    Dense(64, use_bias=False), BatchNormalization(), LeakyReLu(alpha=0.1),
     Dense(y_categorical.shape[1], activation='softmax')
 ])
 
 #Optimization with learning rate inicial
-opt = tf.keras.optimizers.Adam(learning_rate=0.001)
+opt = tf.keras.optimizers.Adam(learning_rate=0.0005)
 
 model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
 
@@ -95,8 +95,8 @@ print("Starting intense training...")
 
 history = model.fit(
     X_train, y_train, 
-    epochs=300,
-    batch_size=64,
+    epochs=500,
+    batch_size=32,
     validation_data=(X_test, y_test),
     callbacks=callbacks
 )
@@ -106,7 +106,8 @@ print("Model save as 'hand_model.h5'")
 #Export as TFLITE (For Raspberry)
 print("Tranforming into TensorFlow Lite...")
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
-converter.optimizations = [tf.lite.Optimize.DEFAULT]
+converter.target_spec.supported_types = [tf.float32] 
+converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
 tflite_model = converter.convert()
 
 with open('hand_model.tflite', 'wb') as f:
