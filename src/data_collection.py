@@ -62,11 +62,29 @@ while True:
     if key == 27:
         break
     elif key != -1 and len(lm_list) > 0:
-        char_pressed = chr(key).upper()
         
-        if 'A' <= char_pressed <= 'Y':
+        label_to_save = None
+        
+        if key == ord('1'):
+            label_to_save = 'Z_START'
+        elif key == ord('2'):
+            label_to_save = 'Z_MID'
+        elif key == ord('3'):
+            label_to_save = 'Z_END'
+        else:
+            try:
+                char_pressed = chr(key).upper()
+                
+                if 'A' <= char_pressed <= 'Y':
+                    label_to_save = char_pressed
+                elif char_pressed == 'Z':
+                    print("WARNING: Do not Press Z. Use keys 1, 2, 3")
+            except ValueError:
+                pass
+        
+        if label_to_save:
             base_x, base_y = lm_list[0][1], lm_list[0][2]
-            row = [char_pressed]
+            row = [label_to_save]
             
             for point in lm_list:
                 row.extend([point[1] - base_x, point[2] - base_y])
@@ -75,9 +93,8 @@ while True:
                 writer = csv.writer(f)
                 writer.writerow(row)
                 
-            print(f"Data saved: {char_pressed}")
-        elif char_pressed == 'Z':
-            print("WARNING, DO NOT SAVE Z. Save the gesture of the letter D")
+            print(f"Data saved: {label_to_save}")
+    
             
 cap.release()
 cv2.destroyAllWindows()
