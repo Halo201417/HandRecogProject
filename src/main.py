@@ -51,6 +51,10 @@ THRESHOLD_CONFIRMATION = 8
 #'Z' variables for dinamic detection
 historial_x = deque(maxlen=15)
 Z_THRESHOLD_MOVEMENT = 0.10
+z_state = 0
+z_last_time = 0
+Z_TIMEOUT = 1.5
+last_letter = ""
 
 print("--- SIGN LANGUAGE TRANSLATOR ---")
 print("Press ESC to exit")
@@ -84,45 +88,42 @@ while True:
         max_index = np.argmax(prediction)
         probability = prediction[0][max_index]
         
+        detected_class = classes[max_index]
+        
         if probability > 0.7:
-            detected_class = classes[max_index]
             
-            if detected_class == next_letter:
-                FPS_count += 1
-            else:
-                next_letter = detected_class
-                FPS_count = 0
-                
-            if FPS_count > THRESHOLD_CONFIRMATION:
-                actual_letter = detected_class
-                
-                if FPS_count > 100:
-                    FPS_count = THRESHOLD_CONFIRMATION + 1
+            current_time = time.time()
             
-            #Movement logic for the letter Z
-            if detected_class == 'D' or detected_class == 'Index' or detected_class == 'X':
-                pos_x_relative = lm_list[8][1] / w_img
-                historial_x.append(pos_x_relative)
+            if z_state > 0 and (current_time - z_last_time > Z_TIMEOUT):
+                z_state = 0
+                print("Z Timeout Reset")
                 
-                if len(historial_x) == 15:
-                    sweep_width = max(historial_x) - min(historial_x)
-                    
-                    if sweep_width > Z_THRESHOLD_MOVEMENT:
-                        actual_letter = 'Z'
-                        historial_x.clear()
+            if detected_class == 'Z_START':
+                z_state = 1
+                z_last_time = current_time
+                last_letter = "Z..."
+            elif detected_class == 'Z_MID':
+                if z_state == 1:
+                    z_state = 2
+                    z_last_time = current_time
+                elif z_state == 0:
+                    z_state = 0
+            elif detected_class == 'Z_END':
+                if z_state == 2:
+                    last_letter = 'Z'
+                    z_state = 0
+                    print("Z DETECTED!")
+                else:
+                    z_state = 0
             else:
-                historial_x.clear()
+                if detected_class not in ['Z_START', 'Z_MID', 'Z_END']:
+                    z_state = 0
+                    last_letter = actual_letter
                 
-            #Show it on the LCD
-            if actual_letter != last_letter_shown:
-                last_letter_shown = actual_letter
-                print(f"[TRANSLATOR] Detected: {actual_letter}")
-                
-            text_color = (0, 255, 0)
-            if actual_letter == 'Z' :
-                text_color = (0, 0, 255)
-                
-            cv2.putText(img, f"Letter: {actual_letter} ({int(probability*100)}%)", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, text_color, 2)
+            cv2.putText(img, f"Letter: {actual_letter} ({int(probability*100)}%)", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+            
+            if z_state > 0:
+                cv2.putText(img, f"Z sequence: step {z_state}/3", (10,90), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,255), 2)
            
     img_final = cv2.resize(img, (480,320)) 
     cv2.imshow("Raspberry Pi, camera", img_final)
