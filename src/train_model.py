@@ -20,7 +20,7 @@ else:
     
 def augment_data(X, y, noise_level=0.05, scale_range=(0.9, 1.1), copies=5):
     """
-    It generates sinthetic data addind noise and scale.
+    It generates sinthetic data adding noise and scale.
     This helps the model to not generalize
     """
     

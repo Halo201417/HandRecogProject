@@ -41,7 +41,7 @@ if not os.path.exists(FILE_NAME):
 print("----DATA INSTRUCTIONS----")
 print("1. Do NOT save the letter Z here")
 print("2. Save the D letter (Index finger up)")
-print("3. The main.py it would we in charge of the letter Z")
+print("3. The letter Z is a special case, we need to do it in 3 parts")
 print("Press ESC to exit")
 
 while True:
@@ -54,7 +54,7 @@ while True:
     lm_list = detector.find_position(img)
     
     cv2.putText(img, "Press key to sabe (A-Y)", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-    cv2.putText(img, "DO NOT SAVE THE LETTER Z", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    cv2.putText(img, "DO NOT SAVE THE LETTER Z THE CONVENTIONAL WAY", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
     
     cv2.imshow("Data collection", img)
     key = cv2.waitKey(1)

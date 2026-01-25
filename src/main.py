@@ -118,6 +118,7 @@ while True:
             else:
                 if detected_class not in ['Z_START', 'Z_MID', 'Z_END']:
                     z_state = 0
+                    actual_letter = detected_class
                     last_letter = actual_letter
                 
             cv2.putText(img, f"Letter: {actual_letter} ({int(probability*100)}%)", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
