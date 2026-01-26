@@ -84,6 +84,11 @@ while True:
             
         input_data = np.array([data_aux], dtype=np.float32)
         
+        #Normalization
+        max_val = np.max(np.abs(input_data))
+        if max_val != 0:
+            input_data = input_data / max_val
+        
         prediction = model.predict(input_data, verbose=0)
         max_index = np.argmax(prediction)
         probability = prediction[0][max_index]
