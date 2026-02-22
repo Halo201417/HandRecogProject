@@ -38,6 +38,29 @@ def normalize_data(X):
     
     return X_scaled.reshape((X.shape[0], X.shape[1], 42))
 
+def augment_sequence_data(X, y, copies=10, noise_level=0.03, scale_range=(0.85, 1.15)):
+    print(f"Creating {copies} copies")
+    
+    X_aug, y_aug = [], []
+    
+    for i in range(len(X)):
+        X_aug.append(X[i])
+        y_aug.append(y[i])
+        
+        for _ in range(copies):
+            sample = X[i].copy()
+            
+            scale = np.random.uniform(scale_range[0], scale_range[1])
+            sample = sample * scale
+
+            noise = np.random.normal(0, noise_level, sample.shape)
+            sample = sample + noise
+            
+            X_aug.append(sample)
+            y_aug.append(y[i])
+            
+    return np.array(X_aug), np.array(y_aug)
+
 print("Charging sequences...")
 
 if os.path.exists('X_data.npy') and os.path.exists('y_data.npy'):
@@ -91,6 +114,7 @@ if X.shape[0] == 0:
     exit()
 
 X = normalize_data(X)
+X, y = augment_sequence_data(X, y, copies=10)
 
 le = LabelEncoder()
 y_encoded = le.fit_transform(y)
