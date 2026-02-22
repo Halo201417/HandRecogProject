@@ -67,11 +67,13 @@ if os.path.exists('hand_data.csv'):
         label_data = df[df['label'] == label].iloc[: , 1:].values.astype('float32')
         for row in label_data:
             seq = np.tile(row,(30,1))
+            noise = np.random.normal(loc=0.0, scale=4.0, size=seq.shape)
+            seq = seq + noise
             sequences.append(seq)
             labels.append(label)
             
     X_static = np.array(sequences)
-    y_static = np.array(label)
+    y_static = np.array(labels)
     
     print(f"Static data loaded: {X_static.shape[0]}")
     

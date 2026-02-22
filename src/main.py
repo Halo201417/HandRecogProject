@@ -168,6 +168,12 @@ while True:
         frame_data = []
         for point in lm_list:
             frame_data.extend([point[1]- base_x, point[2]- base_y])
+            
+        max_val = np.max(np.abs(frame_data))
+        if max_val == 0:
+            max_val = 1.0
+        
+        frame_data = [val / max_val for val in frame_data]
         
         sequence.append(frame_data)
         sequence = sequence[-SEQUENCE_LENGTH:]
