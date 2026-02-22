@@ -25,7 +25,7 @@ def convert_static_sequence():
     print(f"Transforming {len(unique_labels)} static classes...")
     
     for label in unique_labels:
-        label_data = df[df['label'] == 'label'].iloc[:, 1:].values.astype('float32')
+        label_data = df[df['label'] == label].iloc[:, 1:].values.astype('float32')
         
         #We transform wvery "photo" into a "video"
         for row in label_data:

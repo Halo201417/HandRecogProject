@@ -26,6 +26,17 @@ BATCH_SIZE = 32
 PATIENCE = 20
 MODEL_NAME = 'hand_model_lstm.h5'
 
+def normalize_data(X):
+    X_reshaped = X.reshape((X.shape[0], X.shape[1], 21, 2))
+    wrist_coords = X_reshaped[:, :, 0:1, :]
+    X_centered = X_reshaped- wrist_coords
+    
+    max_vals = np.max(np.abs(X_centered), axis=(2,3), keepdims=True)
+    max_vals[max_vals == 0] = 1.0
+    X_scaled = X_centered / max_vals
+    
+    return X_scaled.reshape((X.shape[0], X.shape[1], 42))
+
 print("Charging sequences...")
 if not os.path.exists('X_data.npy') or not os.path.exists('y_data.npy'):
     print("ERROR: Files not found")
@@ -35,6 +46,12 @@ X = np.load('X_data.npy')
 y = np.load('y_data.npy')
 
 print(f"Saved data: {X.shape[0]}")
+
+if X.shape[0] == 0:
+    print("Error, no data")
+    exit()
+
+X = normalize_data(X)
 
 le = LabelEncoder()
 y_encoded = le.fit_transform(y)
