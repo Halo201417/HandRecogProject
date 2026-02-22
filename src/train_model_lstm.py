@@ -1,6 +1,7 @@
 #LSTM (Long Short-Term Memory)
 
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, BatchNormalization
@@ -38,12 +39,48 @@ def normalize_data(X):
     return X_scaled.reshape((X.shape[0], X.shape[1], 42))
 
 print("Charging sequences...")
-if not os.path.exists('X_data.npy') or not os.path.exists('y_data.npy'):
-    print("ERROR: Files not found")
+
+if os.path.exists('X_data.npy') and os.path.exists('y_data.npy'):
+    X_dynamic = np.load('X_data.npy')
+    y_dynamic = np.load('y_data.npy')
+    
+    if y_dynamic.ndim == 0:
+        y_dynamic = np.expand_dims(y_dynamic, axis=0)
+        
+    if X_dynamic.ndim == 2:
+        X_dynamic = np.expand_dims(X_dynamic, axis=0)
+    
+    print(f"Sequences loaded: {X_dynamic.shape[0]}")
+else:
+    print("Error data not found")
     exit()
     
-X = np.load('X_data.npy')
-y = np.load('y_data.npy')
+if os.path.exists('hand_data.csv'):
+    df = pd.read_csv('hand_data.csv')
+    df = df[df['label'] != 'label']
+    
+    sequences = []
+    labels = []
+    unique_labels = df['label'].unique()
+    
+    for label in unique_labels:
+        label_data = df[df['label'] == label].iloc[: , 1:].values.astype('float32')
+        for row in label_data:
+            seq = np.tile(row,(30,1))
+            sequences.append(seq)
+            labels.append(label)
+            
+    X_static = np.array(sequences)
+    y_static = np.array(label)
+    
+    print(f"Static data loaded: {X_static.shape[0]}")
+    
+if X_dynamic.shape[0] > 0 and X_static.shape[0] > 0:
+    X = np.concatenate((X_static, X_dynamic), axis=0)
+    y = np.concatenate((y_static, y_dynamic), axis=0)
+else:
+    print("Error, no data")
+    exit()
 
 print(f"Saved data: {X.shape[0]}")
 
