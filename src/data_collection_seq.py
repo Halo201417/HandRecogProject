@@ -8,7 +8,12 @@ from detector import HandDetector
 SEQUENCE_LENGTH = 30
 CLASSES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'
            , 'T', 'U', 'V', 'W', 'X', 'Y']
-SAVE_KEY = 'Z'
+KEY_MAP = {
+    'z': 'Z',
+    'c': 'CONFIRM',
+    'd': 'DELETE',
+    'f': 'FINAL'
+}
 
 try:
     X_data = np.load('X_data.npy').tolist()
@@ -24,9 +29,10 @@ detector = HandDetector(max_hands=1)
 
 sequence_buffer = []    #Last 30 frames here
 
-print(f"SEQUENCE RECORDER ({SAVE_KEY})")
+print(f"SEQUENCE RECORDER")
 print("1. Make the movement")
-print(f"2. At the moment you finish, press '{SAVE_KEY}'")
+for key_char, label in KEY_MAP.items():
+    print(f"2 -> Press '{key_char}' to save: {label}")
 print("3. ESC to exit and save")
 
 while True:
@@ -59,13 +65,19 @@ while True:
     
     if key == 27:
         break
-    elif key == ord(SAVE_KEY.lower()) or key == ord(SAVE_KEY.upper()):
-        if len(sequence_buffer) == SEQUENCE_LENGTH:
-            X_data.append(np.array(sequence_buffer))
-            y_data.append(SAVE_KEY)
-            print(f"Sequence of {SAVE_KEY} saved")
-        else:
-            print("Incomplete buffer, make the movement slower")
+    elif key != -1:
+        try:
+            char_key = chr(key).lower()
+            if char_key in KEY_MAP:
+                save_label = KEY_MAP[char_key]
+                if len(sequence_buffer) == SEQUENCE_LENGTH:
+                    X_data.append(np.array(sequence_buffer))
+                    y_data.append(save_label)
+                    print(f"Sequence of {save_label} saved")
+                else:
+                    print(f"Incomplete buffer for {save_label}, make the movement slower")
+        except ValueError:
+            pass
             
 print("Saving files...")
 np.save('X_data.npy', np.array(X_data))

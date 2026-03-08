@@ -9,6 +9,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLRO
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 import os
+import matplotlib.pyplot as plt
 
 physical_devices = tf.config.list_physical_devices('GPU')
 
@@ -162,3 +163,39 @@ print(f"Model saved {MODEL_NAME}")
 
 loss, acc = model.evaluate(X_test, y_test)
 print(f"Precission final test: {acc*100:.2f}%")
+
+# Model Graph
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+epochs_range = range(len(acc))
+
+plt.figure(figsize=(14,5))
+
+#Accuracy
+plt.subplot(1,2,1)
+plt.plot(epochs_range, acc, label='Train Accuracy', color='blue', linewidth=2)
+plt.plot(epochs_range, val_acc, label='Validation Accuracy', color='orange', linewidth=2)
+plt.title('Accuracy Evolution')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend(loc='lower right')
+plt.grid(True, linestyle='--', alpha=0.7)
+
+#Loss
+plt.subplot(1, 2, 2)
+plt.plot(epochs_range, loss, label='Train Loss', color='blue', linewidth=2)
+plt.plot(epochs_range, val_loss, label='Validation Loss', color='orange', linewidth=2)
+plt.title('Loss Evolution')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend(loc='upper right')
+plt.grid(True, linestyle='--', alpha=0.7)
+
+plt.tight_layout()
+imagen_grafica = 'training_graphs.png'
+plt.savefig(imagen_grafica, dpi=300)
+print(f"Training graphs saved as '{imagen_grafica}'")
+
+plt.show()

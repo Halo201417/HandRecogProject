@@ -16,6 +16,12 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 #Configuration
 SEQUENCE_LENGTH = 30
 THRESHOLD = 0.8
+COOL_DOWN = 1.5
+
+#Control Commands
+CMD_CONFIRM = 'CONFIRM'
+CMD_DELETE = 'DELETE'
+CMD_CLEAR = 'CLEAR'
 
 #Charge LSTM model
 print("Charging LSTM model...")
@@ -25,7 +31,9 @@ detector = HandDetector(max_hands=1)
 
 cap = cv2.VideoCapture(0)
 sequence = []
-prediction = ""
+current_letter = ""
+word_buffer = []
+last_action_time = 0
 
 while True:
     success, img = cap.read()
@@ -38,35 +46,57 @@ while True:
         base_x, base_y = lm_list[0][1], lm_list[0][2]
         frame_data = []
         for point in lm_list:
-            frame_data.extend([point[1]- base_x, point[2]- base_y])
+            frame_data.extend([point[1] - base_x, point[2] - base_y])
             
-        max_val = np.max(np.abs(frame_data))
-        if max_val == 0:
-            max_val = 1.0
-        
-        frame_data = [val / max_val for val in frame_data]
-        
         sequence.append(frame_data)
         sequence = sequence[-SEQUENCE_LENGTH:]
         
         if len(sequence) == SEQUENCE_LENGTH:
             res = model.predict(np.expand_dims(sequence, axis=0), verbose=0)[0]
+            idx = np.argmax(res)
             
-            if res[np.argmax(res)] > THRESHOLD:
-                prediction = classes[np.argmax(res)]
-            else:
-                prediction = ""
+            if res[idx] > THRESHOLD:
+                prediction = classes[idx]
+                current_time = time.time()
                 
-            color = (0, 255, 0)
-            if prediction == 'Z': color = (0,0,255)
-            
-            cv2.putText(img, f"Letter: {prediction} ({int(res[np.argmax(res)]*100)}%)", (10,50), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
-            
+                if (current_time - last_action_time) > COOL_DOWN:
+                    if prediction == CMD_CONFIRM:
+                        if current_letter != "" and current_letter not in [CMD_CONFIRM, CMD_DELETE, CMD_CLEAR]:
+                            word_buffer.append(current_letter)
+                            print(f"Letter '{current_letter}' confirm")
+                            last_action_time = current_time
+                            
+                    elif prediction == CMD_DELETE:
+                        if len(word_buffer) > 0:
+                            erased = word_buffer.pop()
+                            print(f"Letter '{erased}' deleted")
+                            last_action_time = current_time
+                            
+                    elif prediction == CMD_CLEAR:
+                        if len(word_buffer) > 0:
+                            full_word = "".join(word_buffer)
+                            print(f"Full word: '{full_word}'")
+                            word_buffer = []
+                            last_action_time = current_time
+                            
+                    else:
+                        current_letter = prediction
+                        
     else:
         sequence = []
+        current_letter = ""
         
-    cv2.imshow("LSTM Translator", img)
-    if cv2.waitKey(1) & 0xFF == 27: break
+    cv2.putText(img, f"Watching: {current_letter}", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    current_word_str = "".join(word_buffer)
+    cv2.putText(img, f"Actual Word: {current_word_str}_", (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 150, 0), 2)
     
+    if (time.time() - last_action_time) < COOL_DOWN:
+        cv2.putText(img, "WAIT...", (480, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    else:
+        cv2.putText(img, "READT", (480, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+    cv2.imshow("ASL Translator", img)
+    if cv2.waitKey(1) & 0xFF == 27: break
+
 cap.release()
 cv2.destroyAllWindows()
