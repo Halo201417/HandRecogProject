@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout, BatchNormalization
+from tensorflow.keras.layers import LSTM, Dense, Dropout, BatchNormalization, TimeDistributed
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -39,7 +39,7 @@ def normalize_data(X):
     
     return X_scaled.reshape((X.shape[0], X.shape[1], 42))
 
-def augment_sequence_data(X, y, copies=10, noise_level=0.03, scale_range=(0.85, 1.15)):
+def augment_sequence_data(X, y, copies=10, noise_level=0.015, scale_range=(0.85, 1.15)):
     print(f"Creating {copies} copies")
     
     X_aug, y_aug = [], []
@@ -65,8 +65,8 @@ def augment_sequence_data(X, y, copies=10, noise_level=0.03, scale_range=(0.85, 
 print("Charging sequences...")
 
 if os.path.exists('X_data.npy') and os.path.exists('y_data.npy'):
-    X_dynamic = np.load('X_data.npy')
-    y_dynamic = np.load('y_data.npy')
+    X_dynamic = np.load('X_data.npy', allow_pickle=True)
+    y_dynamic = np.load('y_data.npy', allow_pickle=True)
     
     if y_dynamic.ndim == 0:
         y_dynamic = np.expand_dims(y_dynamic, axis=0)
@@ -91,7 +91,7 @@ if os.path.exists('hand_data.csv'):
         label_data = df[df['label'] == label].iloc[: , 1:].values.astype('float32')
         for row in label_data:
             seq = np.tile(row,(30,1))
-            noise = np.random.normal(loc=0.0, scale=4.0, size=seq.shape)
+            noise = np.random.normal(loc=0.0, scale=2.0, size=seq.shape)
             seq = seq + noise
             sequences.append(seq)
             labels.append(label)
@@ -101,21 +101,16 @@ if os.path.exists('hand_data.csv'):
     
     print(f"Static data loaded: {X_static.shape[0]}")
     
-if X_dynamic.shape[0] > 0 and X_static.shape[0] > 0:
-    X = np.concatenate((X_static, X_dynamic), axis=0)
-    y = np.concatenate((y_static, y_dynamic), axis=0)
-else:
-    print("Error, no data")
-    exit()
+X_static = normalize_data(X_static)
+X_dynamic = normalize_data(X_dynamic)
 
-print(f"Saved data: {X.shape[0]}")
+X_static_aug , y_static_aug = augment_sequence_data(X_static, y_static, copies=2)
+X_dynamic_aug, y_dynamic_aug = augment_sequence_data(X_dynamic, y_dynamic, copies=25)
 
-if X.shape[0] == 0:
-    print("Error, no data")
-    exit()
+X = np.concatenate((X_static_aug, X_dynamic_aug), axis=0)
+y = np.concatenate((y_static_aug, y_dynamic_aug), axis=0)
 
-X = normalize_data(X)
-X, y = augment_sequence_data(X, y, copies=10)
+print(f"Total saved data for training: {X.shape[0]}")
 
 le = LabelEncoder()
 y_encoded = le.fit_transform(y)
@@ -126,7 +121,9 @@ print(f"Classes detected: {le.classes_}")
 X_train, X_test, y_train, y_test = train_test_split(X, y_categorical, test_size=0.2, random_state=42, shuffle=True)
 
 model = Sequential([
-    LSTM(128, return_sequences=True, input_shape=(30,42)),
+    TimeDistributed(Dense(64, activation='relu'), input_shape=(30,42)),
+    
+    LSTM(128, return_sequences=True),
     Dropout(0.2),
     LSTM(64, return_sequences=False),
     Dropout(0.2),
@@ -165,37 +162,26 @@ loss, acc = model.evaluate(X_test, y_test)
 print(f"Precission final test: {acc*100:.2f}%")
 
 # Model Graph
-acc = history.history['accuracy']
-val_acc = history.history['val_accuracy']
-loss = history.history['loss']
-val_loss = history.history['val_loss']
-epochs_range = range(len(acc))
+acc_plot = history.history['accuracy']
+val_acc_plot = history.history['val_accuracy']
+loss_plot = history.history['loss']
+val_loss_plot = history.history['val_loss']
+epochs_range = range(len(acc_plot))
 
-plt.figure(figsize=(14,5))
-
-#Accuracy
-plt.subplot(1,2,1)
-plt.plot(epochs_range, acc, label='Train Accuracy', color='blue', linewidth=2)
-plt.plot(epochs_range, val_acc, label='Validation Accuracy', color='orange', linewidth=2)
-plt.title('Accuracy Evolution')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
+plt.figure(figsize=(14, 5))
+plt.subplot(1, 2, 1)
+plt.plot(epochs_range, acc_plot, label='Train Accuracy', color='blue', linewidth=2)
+plt.plot(epochs_range, val_acc_plot, label='Validation Accuracy', color='orange', linewidth=2)
+plt.title('Evolucion de la Precision')
 plt.legend(loc='lower right')
-plt.grid(True, linestyle='--', alpha=0.7)
+plt.grid(True)
 
-#Loss
 plt.subplot(1, 2, 2)
-plt.plot(epochs_range, loss, label='Train Loss', color='blue', linewidth=2)
-plt.plot(epochs_range, val_loss, label='Validation Loss', color='orange', linewidth=2)
-plt.title('Loss Evolution')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
+plt.plot(epochs_range, loss_plot, label='Train Loss', color='blue', linewidth=2)
+plt.plot(epochs_range, val_loss_plot, label='Validation Loss', color='orange', linewidth=2)
+plt.title('Evolucion de la Perdida')
 plt.legend(loc='upper right')
-plt.grid(True, linestyle='--', alpha=0.7)
+plt.grid(True)
 
 plt.tight_layout()
-imagen_grafica = 'training_graphs.png'
-plt.savefig(imagen_grafica, dpi=300)
-print(f"Training graphs saved as '{imagen_grafica}'")
-
-plt.show()
+plt.savefig('training_graphs.png', dpi=300)

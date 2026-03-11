@@ -15,7 +15,7 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 #Configuration
 SEQUENCE_LENGTH = 30
-THRESHOLD = 0.8
+THRESHOLD = 0.9
 COOL_DOWN = 1.5
 
 #Control Commands
