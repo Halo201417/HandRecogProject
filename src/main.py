@@ -52,7 +52,14 @@ while True:
         sequence = sequence[-SEQUENCE_LENGTH:]
         
         if len(sequence) == SEQUENCE_LENGTH:
-            res = model.predict(np.expand_dims(sequence, axis=0), verbose=0)[0]
+            seq_array = np.array(sequence)
+            max_val = np.max(np.abs(seq_array))
+            
+            if max_val == 0:
+                max_val = 1.0
+                
+            seq_normalized = seq_array / max_val
+            res = model.predict(np.expand_dims(seq_normalized, axis=0), verbose=0)[0]
             idx = np.argmax(res)
             
             if res[idx] > THRESHOLD:
@@ -65,20 +72,17 @@ while True:
                             word_buffer.append(current_letter)
                             print(f"Letter '{current_letter}' confirm")
                             last_action_time = current_time
-                            
                     elif prediction == CMD_DELETE:
                         if len(word_buffer) > 0:
                             erased = word_buffer.pop()
                             print(f"Letter '{erased}' deleted")
                             last_action_time = current_time
-                            
                     elif prediction == CMD_CLEAR:
                         if len(word_buffer) > 0:
                             full_word = "".join(word_buffer)
-                            print(f"Full word: '{full_word}'")
+                            print(f"Complete word: '{full_word}'")
                             word_buffer = []
                             last_action_time = current_time
-                            
                     else:
                         current_letter = prediction
                         
@@ -93,7 +97,7 @@ while True:
     if (time.time() - last_action_time) < COOL_DOWN:
         cv2.putText(img, "WAIT...", (480, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     else:
-        cv2.putText(img, "READT", (480, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(img, "READY", (480, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     cv2.imshow("ASL Translator", img)
     if cv2.waitKey(1) & 0xFF == 27: break
