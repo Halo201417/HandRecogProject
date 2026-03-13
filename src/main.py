@@ -1,14 +1,16 @@
 import cv2
 import time
-import sys
 import numpy as np
 import os
-from collections import deque
 from detector import HandDetector
-import tensorflow as tf
 
 #System configuration
 RASPBERRY_MODE = True
+
+if RASPBERRY_MODE:
+    from keras.models import load_model
+else:
+    import tensorflow as tf
 
 #Graphic configuration for Linux
 os.environ["QT_QPA_PLATFORM"] = "xcb"
@@ -25,7 +27,12 @@ CMD_CLEAR = 'CLEAR'
 
 #Charge LSTM model
 print("Charging LSTM model...")
-model = tf.keras.models.load_model('hand_model_lstm.h5')
+
+if RASPBERRY_MODE:
+    model = load_model('hand_model_lstm.h5')
+else:
+    model = tf.keras.models.load_model('hand_model_lstm.h5')
+
 classes = np.load('classes.npy')
 detector = HandDetector(max_hands=1)
 
