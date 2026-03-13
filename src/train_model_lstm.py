@@ -39,7 +39,7 @@ def normalize_data(X):
     
     return X_scaled.reshape((X.shape[0], X.shape[1], 42))
 
-def augment_sequence_data(X, y, copies=10, noise_level=0.015, scale_range=(0.85, 1.15)):
+def augment_sequence_data(X, y, copies=10, noise_level=0.002, scale_range=(0.85, 1.15)):
     print(f"Creating {copies} copies")
     
     X_aug, y_aug = [], []
