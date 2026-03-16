@@ -16,7 +16,7 @@ COOL_DOWN = 1.5
 #Control Commands
 CMD_CONFIRM = 'CONFIRM'
 CMD_DELETE = 'DELETE'
-CMD_CLEAR = 'CLEAR'
+CMD_CLEAR = 'FINAL'
 
 #Charge LSTM model
 print("Charging LSTM model...")
