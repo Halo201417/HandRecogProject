@@ -30,6 +30,10 @@ current_letter = ""
 word_buffer = []
 last_action_time = 0
 
+completed_word_to_display = ""
+display_word_start_time = 0
+DISPLAY_DURATION = 6.0
+
 while True:
     success, img = cap.read()
     if not success: break
@@ -76,6 +80,9 @@ while True:
                         if len(word_buffer) > 0:
                             full_word = "".join(word_buffer)
                             print(f"Complete word: '{full_word}'")
+
+                            completed_word_to_display = full_word
+                            display_word_start_time = current_time
                             word_buffer = []
                             last_action_time = current_time
                     else:
@@ -93,6 +100,18 @@ while True:
         cv2.putText(img, "WAIT...", (480, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     else:
         cv2.putText(img, "READY", (480, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        
+    if completed_word_to_display and (time.time() - display_word_start_time) < DISPLAY_DURATION:
+        font = cv2.FONT_HERSHEY_DUPLEX
+        scale = 3
+        thickness = 6
+        
+        text_size = cv2.getTextSize(completed_word_to_display, font, scale, thickness)[0]
+        text_x = (img.shape[1] - text_size[0]) // 2
+        text_y = (img.shape[0] + text_size[1]) // 2
+        
+        cv2.putText(img, completed_word_to_display, (text_x +4, text_y + 4), font, scale, (0, 0, 0), thickness + 4)
+        cv2.putText(img, completed_word_to_display, (text_x, text_y), font, scale, (0, 255, 255), thickness)
 
     cv2.imshow("ASL Translator", img)
     if cv2.waitKey(1) & 0xFF == 27: break
