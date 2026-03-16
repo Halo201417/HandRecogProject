@@ -1,0 +1,120 @@
+<h1 align="center">Hand Recognition Project ✋�</h1>
+
+<p align="center">
+  <a href="https://github.com/your-username/HandRecogProject/stargazers">
+    <img src="https://img.shields.io/github/stars/your-username/HandRecogProject.svg?colorA=363a4f&colorB=b7bdf8&style=for-the-badge" alt="Stars">
+  </a>
+  <a href="https://github.com/your-username/HandRecogProject/issues">
+    <img src="https://img.shields.io/github/issues/your-username/HandRecogProject.svg?colorA=363a4f&colorB=f5a97f&style=for-the-badge" alt="Issues">
+  </a>
+  <a href="https://github.com/your-username/HandRecogProject/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/your-username/HandRecogProject.svg?colorA=363a4f&colorB=a6da95&style=for-the-badge" alt="License">
+  </a>
+</p>
+
+<p align="center">
+  <b>A real-time Sign Language to text translation system, powered by Artificial Intelligence and MediaPipe.</b>
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
+</p>
+
+## � Table of Contents
+
+- [� Prerequisites](#-prerequisites)
+- [⚙️ Installation and Setup](#️-installation-and-setup)
+- [� System Usage](#-system-usage)
+- [� Code Structure](#-code-structure)
+- [� Contributing](#-contributing)
+- [� License](#-license)
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
+</p>
+
+## � Prerequisites
+
+This project has been developed, optimized, and thoroughly tested on **Debian 12 (Bookworm)**, and features cross-support for Edge boards like the **Raspberry Pi**.
+
+* **Operating System:** Debian 12 or derivative Linux distributions (or Raspberry Pi OS).
+* **Python:** Python 3.11 (default native version on Debian 12).
+* **Hardware:** * A functional webcam.
+    * Processor compatible with x86_64 (PC) or aarch64 (Raspberry Pi ARM).
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
+</p>
+
+## ⚙️ Installation and Setup
+
+Follow these steps to configure the environment in an isolated and secure way using virtual environments.
+
+### 1. Clone the repository
+Open a terminal and download the project to your local computer:
+```bash
+git clone [https://github.com/your-username/HandRecogProject.git](https://github.com/your-username/HandRecogProject.git)
+cd HandRecogProject
+```
+
+### 2. Create and activate the Virtual Environment (`venv`)
+Isolate dependencies to avoid conflicts with your global Linux libraries:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+With the `(venv)` environment activated, install exactly the tested required versions for maximum compatibility:
+```bash
+pip install -r requirements.txt
+```
+> **� Cross-platform Note:** The `requirements.txt` file is purged of proprietary drivers to ensure that the installation of heavy libraries (TensorFlow/Keras, OpenCV) runs without errors regardless of the CPU you use.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
+</p>
+
+## � System Usage
+
+The workflow is modular and divided into 3 phases (always run from the project root):
+
+### 1. Data Collection (`src/data_collection_seq.py`)
+Create your own dynamic dataset by recording gestures with the camera in real-time:
+* **Command:** `python src/data_collection_seq.py`
+* Enter the gesture name (e.g., `J`, `CONFIRM`). Press the `S` key in front of the camera to save the 3D hand movement.
+
+### 2. Model Training (`src/train_model_lstm.py`)
+Train the LSTM neural network with the collected data (`X_data.npy` and `y_data.npy`):
+* **Command:** `python src/train_model_lstm.py`
+* The system will balance the data and generate a `hand_model_lstm.h5` file and a visual training graph.
+
+### 3. Real-Time Translation (`src/main.py`)
+Open the webcam and classify your movements instantly:
+* **Command:** `python src/main.py`
+* *Built-in NLP Logic:* Use commands like `CONFIRM` to consolidate letters or `DELETE` to erase the last entered letter and form words.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
+</p>
+
+## � Code Structure
+
+* `src/main.py` - Main translation application and cross-platform logic (PC/Raspberry Pi).
+* `src/train_model_lstm.py` - Neural network training architecture (TimeDistributed + LSTM).
+* `src/data_collection_seq.py` - Temporal capture engine using OpenCV.
+* `src/detector.py` - Optimized wrapper for MediaPipe bone mapping AI.
+* `requirements.txt` - Production environment dependency list.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
+</p>
+
+## � Contributing
+
+Contributions, issues, and pull requests are welcome! 
+Feel free to check the [issues page](https://github.com/your-username/HandRecogProject/issues).
+
+## � License
+
+This project is licensed under the **MIT** license. You can freely use, modify, and distribute it.
