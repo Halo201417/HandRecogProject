@@ -60,8 +60,7 @@ Follow these steps to configure the environment in an isolated and secure way us
 ### 1. Clone the repository
 Open a terminal and download the project to your local computer:
 ```bash
-git clone [https://github.com/Halo201417/HandRecogProject.git](https://github.com/Halo201417/HandRecogProject.git)
-cd HandRecogProject
+git clone https://github.com/Halo201417/HandRecogProject.git
 ```
 
 ### 2. Create and activate the Virtual Environment (`venv`)
