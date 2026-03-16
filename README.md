@@ -1,14 +1,14 @@
 <h1 align="center">Hand Recognition Project ✋🤖</h1>
 
 <p align="center">
-  <a href="https://github.com/your-username/HandRecogProject/stargazers">
-    <img src="https://img.shields.io/github/stars/your-username/HandRecogProject.svg?colorA=363a4f&colorB=b7bdf8&style=for-the-badge" alt="Stars">
+  <a href="https://github.com/Halo201417/HandRecogProject/stargazers">
+    <img src="https://img.shields.io/github/stars/Halo201417/HandRecogProject.svg?colorA=363a4f&colorB=b7bdf8&style=for-the-badge" alt="Stars">
   </a>
-  <a href="https://github.com/your-username/HandRecogProject/issues">
-    <img src="https://img.shields.io/github/issues/your-username/HandRecogProject.svg?colorA=363a4f&colorB=f5a97f&style=for-the-badge" alt="Issues">
+  <a href="https://github.com/Halo201417/HandRecogProject/issues">
+    <img src="https://img.shields.io/github/issues/Halo201417/HandRecogProject.svg?colorA=363a4f&colorB=f5a97f&style=for-the-badge" alt="Issues">
   </a>
-  <a href="https://github.com/your-username/HandRecogProject/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/your-username/HandRecogProject.svg?colorA=363a4f&colorB=a6da95&style=for-the-badge" alt="License">
+  <a href="https://github.com/Halo201417/HandRecogProject/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/Halo201417/HandRecogProject.svg?colorA=363a4f&colorB=a6da95&style=for-the-badge" alt="License">
   </a>
 </p>
 
@@ -53,7 +53,7 @@ Follow these steps to configure the environment in an isolated and secure way us
 ### 1. Clone the repository
 Open a terminal and download the project to your local computer:
 ```bash
-git clone [https://github.com/your-username/HandRecogProject.git](https://github.com/your-username/HandRecogProject.git)
+git clone [https://github.com/Halo201417/HandRecogProject.git](https://github.com/Halo201417/HandRecogProject.git)
 cd HandRecogProject
 ```
 
@@ -113,7 +113,7 @@ Open the webcam and classify your movements instantly:
 ## 🤝 Contributing
 
 Contributions, issues, and pull requests are welcome! 
-Feel free to check the [issues page](https://github.com/your-username/HandRecogProject/issues).
+Feel free to check the [issues page](https://github.com/Halo201417/HandRecogProject/issues).
 
 ## 📄 License
 
