@@ -121,6 +121,7 @@ Open the webcam and classify your movements instantly:
 * `src/main.py` - Main translation application and cross-platform logic (PC/Raspberry Pi).
 * `src/train_model_lstm.py` - Neural network training architecture (TimeDistributed + LSTM).
 * `src/data_collection_seq.py` - Temporal capture engine using OpenCV.
+* `src/data_collection.py` - Temporal capture engine using OpenCV.
 * `src/detector.py` - Optimized wrapper for MediaPipe bone mapping AI.
 * `requirements.txt` - Production environment dependency list.
 
