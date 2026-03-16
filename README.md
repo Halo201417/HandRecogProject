@@ -1,4 +1,4 @@
-<h1 align="center">Hand Recognition Project ✋�</h1>
+<h1 align="center">Hand Recognition Project ✋🤖</h1>
 
 <p align="center">
   <a href="https://github.com/your-username/HandRecogProject/stargazers">
@@ -20,20 +20,20 @@
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
 </p>
 
-## � Table of Contents
+## 📖 Table of Contents
 
-- [� Prerequisites](#-prerequisites)
+- [📋 Prerequisites](#-prerequisites)
 - [⚙️ Installation and Setup](#️-installation-and-setup)
-- [� System Usage](#-system-usage)
-- [� Code Structure](#-code-structure)
-- [� Contributing](#-contributing)
-- [� License](#-license)
+- [🚀 System Usage](#-system-usage)
+- [📁 Code Structure](#-code-structure)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
 </p>
 
-## � Prerequisites
+## 📋 Prerequisites
 
 This project has been developed, optimized, and thoroughly tested on **Debian 12 (Bookworm)**, and features cross-support for Edge boards like the **Raspberry Pi**.
 
@@ -69,13 +69,13 @@ With the `(venv)` environment activated, install exactly the tested required ver
 ```bash
 pip install -r requirements.txt
 ```
-> **� Cross-platform Note:** The `requirements.txt` file is purged of proprietary drivers to ensure that the installation of heavy libraries (TensorFlow/Keras, OpenCV) runs without errors regardless of the CPU you use.
+> **💡 Cross-platform Note:** The `requirements.txt` file is purged of proprietary drivers to ensure that the installation of heavy libraries (TensorFlow/Keras, OpenCV) runs without errors regardless of the CPU you use.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
 </p>
 
-## � System Usage
+## 🚀 System Usage
 
 The workflow is modular and divided into 3 phases (always run from the project root):
 
@@ -98,7 +98,7 @@ Open the webcam and classify your movements instantly:
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
 </p>
 
-## � Code Structure
+## 📁 Code Structure
 
 * `src/main.py` - Main translation application and cross-platform logic (PC/Raspberry Pi).
 * `src/train_model_lstm.py` - Neural network training architecture (TimeDistributed + LSTM).
@@ -110,11 +110,14 @@ Open the webcam and classify your movements instantly:
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" alt="line">
 </p>
 
-## � Contributing
+## 🤝 Contributing
 
 Contributions, issues, and pull requests are welcome! 
 Feel free to check the [issues page](https://github.com/your-username/HandRecogProject/issues).
 
-## � License
+## 📄 License
 
 This project is licensed under the **MIT** license. You can freely use, modify, and distribute it.
+
+---
+*README generated inspired by the visual structure of [@andreasbm/readme](https://github.com/andreasbm/readme).*
