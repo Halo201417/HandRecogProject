@@ -2,13 +2,13 @@
 
 <p align="center">
   <a href="https://github.com/Halo201417/handrecogproject/stargazers">
-    <img src="https://img.shields.io/github/stars/Halo201417/handrecogproject.svg?colorA=363a4f&colorB=b7bdf8&style=for-the-badge" alt="Stars">
+    <img src="https://img.shields.io/github/stars/Halo201417/handrecogproject.svg?colorA=363a4f&colorB=b7bdf8&style=for-the-badge&v=1" alt="Stars">
   </a>
   <a href="https://github.com/Halo201417/handrecogproject/issues">
-    <img src="https://img.shields.io/github/issues/Halo201417/handrecogproject.svg?colorA=363a4f&colorB=f5a97f&style=for-the-badge" alt="Issues">
+    <img src="https://img.shields.io/github/issues/Halo201417/handrecogproject.svg?colorA=363a4f&colorB=f5a97f&style=for-the-badge&v=1" alt="Issues">
   </a>
   <a href="https://github.com/Halo201417/handrecogproject/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/Halo201417/handrecogproject.svg?colorA=363a4f&colorB=a6da95&style=for-the-badge" alt="License">
+    <img src="https://img.shields.io/github/license/Halo201417/handrecogproject.svg?colorA=363a4f&colorB=a6da95&style=for-the-badge&v=1" alt="License">
   </a>
 </p>
 
