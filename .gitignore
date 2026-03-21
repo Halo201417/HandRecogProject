@@ -3,3 +3,11 @@ __pycache__/
 .vscode/arduino.json
 .gitignore
 .editorconfig
+classes.npy
+hand_data.csv
+hand_model_lstm.h5
+hand_model.h5
+hand_model.tflite
+training_graphs.png
+X_data.npy
+y_data.npy
