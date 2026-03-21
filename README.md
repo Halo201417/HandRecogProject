@@ -1,14 +1,14 @@
 <h1 align="center">Hand Recognition Project ✋🤖</h1>
 
 <p align="center">
-  <a href="https://github.com/Halo201417/HandRecogProject/stargazers">
-    <img src="https://img.shields.io/github/stars/Halo201417/HandRecogProject.svg?colorA=363a4f&colorB=b7bdf8&style=for-the-badge" alt="Stars">
+  <a href="https://github.com/Halo201417/handrecogproject/stargazers">
+    <img src="https://img.shields.io/github/stars/Halo201417/handrecogproject.svg?colorA=363a4f&colorB=b7bdf8&style=for-the-badge" alt="Stars">
   </a>
-  <a href="https://github.com/Halo201417/HandRecogProject/issues">
-    <img src="https://img.shields.io/github/issues/Halo201417/HandRecogProject.svg?colorA=363a4f&colorB=f5a97f&style=for-the-badge" alt="Issues">
+  <a href="https://github.com/Halo201417/handrecogproject/issues">
+    <img src="https://img.shields.io/github/issues/Halo201417/handrecogproject.svg?colorA=363a4f&colorB=f5a97f&style=for-the-badge" alt="Issues">
   </a>
-  <a href="https://github.com/Halo201417/HandRecogProject/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/Halo201417/HandRecogProject.svg?colorA=363a4f&colorB=a6da95&style=for-the-badge" alt="License">
+  <a href="https://github.com/Halo201417/handrecogproject/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/Halo201417/handrecogproject.svg?colorA=363a4f&colorB=a6da95&style=for-the-badge" alt="License">
   </a>
 </p>
 
